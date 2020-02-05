@@ -1,9 +1,6 @@
 Hello Praveen
 registration
 login
-<<<<<<< HEAD
 kumar
-=======
 pk
-
->>>>>>> 29ad27fdc9ff65709f4d29d1c16d96f4104f8e82
+112
