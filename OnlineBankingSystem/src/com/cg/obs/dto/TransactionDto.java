@@ -15,10 +15,45 @@ public class TransactionDto {
 	private LocalDate date;
 	private float amtReceived;
 	
+	public TransactionDto(String username, float amtTransfer, float balance, LocalDate date, float amtReceived,
+			long receiverAccountNumber, long senderAccountNumber) {
+		super();
+		this.username = username;
+		this.amtTransfer = amtTransfer;
+		this.balance = balance;
+		this.date = date;
+		this.amtReceived = amtReceived;
+		this.receiverAccountNumber = receiverAccountNumber;
+		this.senderAccountNumber = senderAccountNumber;
+	}
+
+
+
+	private long receiverAccountNumber;
+	private long senderAccountNumber;
+	
 	/*
 		Constructor of the DTO class.
 	 */
 	
+	public long getSenderAccountNumber() {
+		return senderAccountNumber;
+	}
+
+	public void setSenderAccountNumber(long senderAccountNumber) {
+		this.senderAccountNumber = senderAccountNumber;
+	}
+	
+	public long getReceiverAccountNumber() {
+		return receiverAccountNumber;
+	}
+
+	public void setReceiverAccountNumber(long receiverAccountNumber) {
+		this.receiverAccountNumber = receiverAccountNumber;
+	}
+	
+	
+
 	public TransactionDto(){}
 	
 	public TransactionDto(String username, float amtReceived, float balance) {

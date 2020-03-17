@@ -1,9 +1,11 @@
 package com.cg.obs.ui;
 
+import java.util.List;
 import java.util.Scanner;
 
 import com.cg.obs.dao.StaticCustomerDb;
 import com.cg.obs.dao.StaticTransferDb;
+import com.cg.obs.dao.StaticTransferDbNew;
 import com.cg.obs.dto.AccountDto;
 import com.cg.obs.dto.TransactionDto;
 import com.cg.obs.dto.UserDto;
@@ -23,8 +25,11 @@ public class ObsMain {
 
 		StaticCustomerDb custDb=new StaticCustomerDb();
 		StaticTransferDb transDb=new StaticTransferDb();
-		System.out.println(custDb.customerDb+"\n");
-		System.out.println(transDb.transactionDb);
+		StaticTransferDbNew transDbNew=new StaticTransferDbNew();
+		//System.out.println(custDb.customerDb+"\n");
+		//System.out.println(transDb.transactionDb);
+		System.out.println("*********************************************************************");
+		System.out.println(transDbNew.transactionDbNew);
 
 		Scanner sc=new Scanner(System.in);
 
@@ -47,20 +52,20 @@ public class ObsMain {
 				String userName=sc.next();
 				System.out.print("\t\tplease Enter your Password    : ");
 				String password=sc.next();
-				System.out.println(userName+" "+password);
+				//System.out.println(userName+" "+password);
 				boolean adminReq=adminService.login(userName,password);
 
 
 				if(adminReq==false)
 				{
-                   System.out.println("Not a valid Admin");
+                   System.out.println("\nNot a valid Admin");
 				}
 				else
 				{
 
 					while(adminReq)
 					{
-						System.out.println("\n\n\t\t\t\t1 : To View Customers List");
+						System.out.println("\n\n\t\t\t 1: To View Customers List");
 						System.out.println("\t\t\t\t2 : To Create a New Accout On Customer Request");
 						System.out.println("\t\t\t\t3 : To Check the Transaction Report of Customers");
 						System.out.println("\t\t\t\t4 : To Accept the Cusotmer's Service Request");
@@ -73,6 +78,8 @@ public class ObsMain {
 						case 1:
 						{
 							System.out.println("\t\t\t\t\t\tView Customer List service is under progress");
+							
+							System.out.println("\n"+adminService.viewCustomerList());
 
 							break;
 						}
@@ -83,6 +90,8 @@ public class ObsMain {
 							boolean formReq=true;
 							while(formReq)		//opening of while loop of account form
 							{
+								
+								
 								System.out.println("\n\n\t\t\t\t\tPress 1: To fill the form");
 								System.out.println("\t\t\t\t\tPress 2: Go to previous menu");
 								System.out.println("\n\n");
@@ -92,6 +101,8 @@ public class ObsMain {
 								{
 								case 1:
 								{
+									UserDto userDto=new UserDto();
+
 									System.out.println("\n\t\t\t\t\t\tFollowing Requirement needed:\n");
 									System.out.println("  \t\t\t\t\t\t1:Customer Full Name*");
 									System.out.println("  \t\t\t\t\t\t2:Customer Age*");
@@ -105,24 +116,30 @@ public class ObsMain {
 									String custName=sc.next();
 									if(custName.length()>0)
 									{
+										userDto.setCustName(custName);
 										System.out.print("\t\t\t\t\t\tEnter Customer Age: ");
 										int custAge=sc.nextInt();
+										userDto.setAge(custAge);
 										System.out.print("\t\t\t\t\t\tEnter Customer Gender: ");
 										String custGender=sc.next();
 										if(custGender.length()>0)
 										{
+											userDto.setGender(custGender);
 											System.out.print("\t\t\t\t\t\tEnter Customer Address: ");
 											String custAddress=sc.next();
 											if(custAddress.length()>0)
 											{
+												userDto.setAddress(custAddress);
 												System.out.print("\t\t\t\t\t\tEnter Customer Contact No: ");
 												long custMobileNo=sc.nextLong();
-												if(custMobileNo>0)
+												if(custMobileNo>999999999)
 												{
+													userDto.setPhoneNo(custMobileNo);
 													System.out.print("\t\t\t\t\t\tEnter Customer Aadhar No: ");
 													long custAadharNo=sc.nextLong();
 													if(custAadharNo>0)
 													{
+														userDto.setAadharNo(custAadharNo);
 
 														boolean emailReq=true;
 														while(emailReq)
@@ -143,12 +160,14 @@ public class ObsMain {
 																String custEmailId=sc.next();
 																if(custEmailId.length()>0)
 																{
+																	userDto.setEmailId(custEmailId);
 																	System.out.println("\n\t\t\t\t\t\t*****Your account has been created successfully******\n");
 																	System.out.print("\n\t\t\t\t\t\tplease set your UserName: ");
 																	newUserName=sc.next();
+																	userDto.setUserName(newUserName);
 																	System.out.print("\n\t\t\t\t\t\tplease set your Password: ");
 																	newPassword=sc.next();
-
+																	userDto.setPassword(newPassword);
 																	System.out.println("\n\t\t\t\t*****THANK YOU FOR CREATING AN ACCOUNT*****");
 																	emailReq=false;
 																}
@@ -160,6 +179,7 @@ public class ObsMain {
 																break;
 
 															}
+			
 															case 2:
 															{
 																emailReq=false;
@@ -198,6 +218,11 @@ public class ObsMain {
 									{
 										System.out.println("\t\t\t\t\t\tplease enter the valid Customer Name");
 									}
+									
+									
+									
+									AccountDto accDto=new AccountDto(userDto.getUserName(),0,"0");
+									System.out.println(adminService.addCustomer(accDto, userDto));
 									break;
 								}
 								case 2:
@@ -209,21 +234,274 @@ public class ObsMain {
 								{
 									System.out.println("\t\t\t\t\t\tyou have entered the wrong choice");
 								}
-								}				// account form switch ended
+								}
+								// account form switch ended
 								//System.out.println("\t\t\t\t\t\tCreate a New Account On Customer Request service is under progress");
 
 							}
+							
 							break;
 						}
 
+//						case 3:
+//						{
+//							System.out.println("\n");
+//							System.out.println(adminService.transactionDetails());
+//							
+//							break;
+//						}
+						
 						case 3:
 						{
-							System.out.println("\t\t\t\t\t\tCheck the Transaction Report of Customers service is under progress");
+							boolean transactionFlag=true;
+							while(transactionFlag)
+							{
+								System.out.println("\n\n\t\t\t\t\tPress 1: All Customers transactions:");
+								System.out.println("\t\t\t\t\tPress 2: Transactions By Account no:");
+								System.out.println("\t\t\t\t\tPress 3: Go to previous menu");
+								System.out.print("\n\t\t\t\t\tEnter your choice:");
+								int transactionChoice=sc.nextInt();
+						
+								switch(transactionChoice)
+								{
+								case 1:
+								{
+									
+									boolean reportCheck=true;
+									while(reportCheck)
+									{
+						
+										System.out.println("\n\n\t\t\t\t\t\tPress 1: To See Monthly Report");
+										System.out.println("\t\t\t\t\t\tPress 2: To see quarterly Report");
+										System.out.println("\t\t\t\t\t\tPress 3: To see Yearly Report");
+										System.out.println("\t\t\t\t\t\tPress 4: Go to previous menu");
+										System.out.print("\n\n\t\t\t\t\t\tEnter Your Choice  : ");
+										int reportChoice=sc.nextInt();
+					
+										switch(reportChoice)
+										{
+											case 1:
+											{
+												List<TransactionDto> transactionReport=adminService.allMonthlyTransactionDetails();
+												if(transactionReport.isEmpty())
+												{
+													System.out.println("\n\t\t\t\t\t\tno transaction yet");
+												}
+									
+												else
+												{
+													System.out.println("\n\n\t\t\t\tList of all monthly transactions:");
+													float totalTransfer=0.0f;
+													System.out.println("\n\t\t\t\tUserName\tDate Of Transfer\tTransaction Amount\tCurrent Balance\n");
+													for(TransactionDto td:transactionReport)
+													{
+														totalTransfer+=td.getAmtTransfer();
+														System.out.println("\t\t\t\t"+td.getUsername()+"\t"+td.getDate()+"\t\t"+td.getAmtTransfer()+"\t\t  \t"+td.getBalance());
+													}
+													System.out.println("\n\t\t\t\t----------------------------------------------------------------------------------");
+													System.out.println("\t\t\t\t\t\tTotal monthly Transactions"+" : "+totalTransfer);
+													System.out.println("\t\t\t\t----------------------------------------------------------------------------------");
+												}
+												break;
+											}
+											case 2:
+											{
+												List<TransactionDto> transactionReport=adminService.allQuarterlyTransactionDetails();
+												if(transactionReport.isEmpty())
+												{
+													System.out.println("\n\t\t\t\t\t\tno transaction yet");
+												}
+									
+												else
+												{
+													System.out.println("\n\n\t\t\t\tList of all quarterly transactions:");
+													float totalTransfer=0.0f;
+													System.out.println("\n\t\t\t\tUserName\tDate Of Transfer\tTransaction Amount\tCurrent Balance\n");
+													for(TransactionDto td:transactionReport)
+													{
+														totalTransfer+=td.getAmtTransfer();
+														System.out.println("\t\t\t\t"+td.getUsername()+"\t"+td.getDate()+"\t\t"+td.getAmtTransfer()+"\t\t  \t"+td.getBalance());
+													}
+													System.out.println("\n\t\t\t\t----------------------------------------------------------------------------------");
+													System.out.println("\t\t\t\t\t\tTotal Quarterly Transactions"+" : "+totalTransfer);
+													System.out.println("\t\t\t\t----------------------------------------------------------------------------------");
+												
+												}
+												break;
+											}
+											case 3:
+											{
+												List<TransactionDto> transactionReport=adminService.allYearlyTransactionDetails();
+												if(transactionReport.isEmpty())
+												{
+													System.out.println("\n\t\t\t\t\t\tno transaction yet");
+												}
+									
+												else
+												{
+													System.out.println("\n\n\t\t\t\tList of all yearly transactions:");
+													float totalTransfer=0.0f;
+													System.out.println("\n\t\t\t\tUserName\tDate Of Transfer\tTransaction Amount\tCurrent Balance\n");
+													for(TransactionDto td:transactionReport)
+													{
+														totalTransfer+=td.getAmtTransfer();
+														System.out.println("\t\t\t\t"+td.getUsername()+"\t"+td.getDate()+"\t\t"+td.getAmtTransfer()+"\t\t  \t"+td.getBalance());
+													}
+													System.out.println("\n\t\t\t\t----------------------------------------------------------------------------------");
+													System.out.println("\t\t\t\t\t\tTotal Yealy Transactions"+" : "+totalTransfer);
+													System.out.println("\t\t\t\t----------------------------------------------------------------------------------");
+												}
+												break;
+											}
+											case 4:
+											{
+												reportCheck=false;
+												break;
+											}
+											default:
+											{
+												break;
+											}
+										}
+									}
+
+									break;
+								}
+									case 2:
+									{
+										System.out.print("\n\n\t\t\t\t\t\tEnter the Customer Account No. : ");
+										long accNo=sc.nextLong();
+										boolean reportCheck=true;
+										while(reportCheck)
+										{
+							
+											System.out.println("\n\n\t\t\t\t\t\tPress 1: To See Monthly Report");
+											System.out.println("\t\t\t\t\t\tPress 2: To see quarterly Report");
+											System.out.println("\t\t\t\t\t\tPress 3: To see Yearly Report");
+											System.out.println("\t\t\t\t\t\tPress 4: Go to previous menu");
+											System.out.print("\n\n\t\t\t\t\t\tEnter Your Choice  : ");
+											int reportChoice=sc.nextInt();
+						
+											switch(reportChoice)
+											{
+												case 1:
+												{
+													List<TransactionDto> transactionReport=adminService.monthlyTransactionDetails(accNo);
+													if(transactionReport.isEmpty())
+													{
+														System.out.println("\n\t\t\t\t\t\t  Account No does not match");
+													}
+										
+													else if(transactionReport.get(0).getUsername()=="a")
+													{
+														System.out.println("\n\t\t\t\t\t\tno transaction yet");
+													}
+													else
+													{
+														System.out.println("\n\n\t\t\t\tList of all monthly transactions of Customer:");
+														float totalTransfer=0.0f;
+														System.out.println("\n\t\t\t\tUserName\tDate Of Transfer\tTransaction Amount\tCurrent Balance\n");
+														for(TransactionDto td:transactionReport)
+														{
+															totalTransfer+=td.getAmtTransfer();
+															System.out.println("\t\t\t\t"+td.getUsername()+"\t"+td.getDate()+"\t\t"+td.getAmtTransfer()+"\t\t  \t"+td.getBalance());
+														}
+														System.out.println("\n\t\t\t\t----------------------------------------------------------------------------------");
+														System.out.println("\t\t\t\tTotal Monthly Transactions of customer"+" : "+totalTransfer);
+														System.out.println("\t\t\t\t----------------------------------------------------------------------------------");
+													
+													}
+													break;
+												}
+												case 2:
+												{
+													List<TransactionDto> transactionReport=adminService.quarterlyTransactionDetails(accNo);
+													if(transactionReport.isEmpty())
+													{
+														System.out.println("\n\t\t\t\t\t\t  Account No does not match");
+													}
+										
+													else if(transactionReport.get(0).getUsername()=="a")
+													{
+														System.out.println("\n\t\t\t\t\t\tno transaction yet");
+													}
+													else
+													{
+														System.out.println("\n\n\t\t\t\tList of all quarterly transactions of Customer:");
+														float totalTransfer=0.0f;
+														System.out.println("\n\t\t\t\tUserName\tDate Of Transfer\tTransaction Amount\tCurrent Balance\n");
+														for(TransactionDto td:transactionReport)
+														{
+															totalTransfer+=td.getAmtTransfer();
+															System.out.println("\t\t\t\t"+td.getUsername()+"\t"+td.getDate()+"\t\t"+td.getAmtTransfer()+"\t\t  \t"+td.getBalance());
+														}
+														System.out.println("\n\t\t\t\t----------------------------------------------------------------------------------");
+														System.out.println("\t\t\t\tTotal Quarterly Transactions of customer"+" : "+totalTransfer);
+														System.out.println("\t\t\t\t----------------------------------------------------------------------------------");
+													
+													}
+													break;
+												}
+												case 3:
+												{
+													List<TransactionDto> transactionReport=adminService.yearlyTransactionDetails(accNo);
+													if(transactionReport.isEmpty())
+													{
+														System.out.println("\n\t\t\t\t\t\t  Account No does not match");
+													}
+										
+													else if(transactionReport.get(0).getUsername()=="a")
+													{
+														System.out.println("\n\t\t\t\t\t\tno transaction yet");
+													}
+													else
+													{
+														System.out.println("\n\n\t\t\t\tList of all yearly transactions of Customer:");
+														float totalTransfer=0.0f;
+														System.out.println("\n\t\t\t\tUserName\tDate Of Transfer\tTransaction Amount\tCurrent Balance\n");
+														for(TransactionDto td:transactionReport)
+														{
+															totalTransfer+=td.getAmtTransfer();
+															System.out.println("\t\t\t\t"+td.getUsername()+"\t"+td.getDate()+"\t\t"+td.getAmtTransfer()+"\t\t  \t"+td.getBalance());
+														}
+														System.out.println("\n\t\t\t\t----------------------------------------------------------------------------------");
+														System.out.println("\t\t\t\tTotal Yealy Transactions of customer"+" : "+totalTransfer);
+														System.out.println("\t\t\t\t----------------------------------------------------------------------------------");
+													
+													}
+													break;
+												}
+												case 4:
+												{
+													reportCheck=false;
+													break;
+												}
+												default:
+												{
+													break;
+												}
+											}
+										}
+									break;
+									}
+									case 3:
+									{
+										transactionFlag=false;
+										break;
+									}
+									default:
+									{
+										System.out.println("\t\t\t\t\t\t\t\tPlease enter the right choice!");
+										break;
+									}
+										
+								}
+							}
 							break;
 						}
 						case 4:
 						{
-							System.out.println("\t\t\t\t\t\tCheck the Transaction Report of Customers service is under progress");
+							System.out.println("\t\t\t\t\t\tCheck The Transaction Report of Customers service is under progress");
 							break;
 						}
 						case 5:
@@ -394,7 +672,7 @@ public class ObsMain {
 									System.out.println("\t\t\t\t\t\tplease enter the valid Customer Name");
 								}
 								AccountDto accDto=new AccountDto(userDto.getUserName(),0,"0");
-								custservice.addCustomer(accDto, userDto);
+								System.out.println(custservice.addCustomer(accDto, userDto));
 								//custDb.customerDb.put(accDto, userDto);
 
 								break;
@@ -420,8 +698,6 @@ public class ObsMain {
 					String userName=sc.nextLine();
 					System.out.print("\t\t\t\tplease Enter your Password       : ");
 					String password=sc.nextLine();
-					System.out.println(userName);
-					System.out.println(password);
 					boolean custRequest1=custservice.custLogin(userName,password);
 					if(custRequest1==false)
 					{
@@ -462,19 +738,22 @@ public class ObsMain {
 
 									case 1:
 									{
-										System.out.println("\t\t\t\t\t\t\t\t"+custservice.viewStatement(userName));
+										System.out.println("\n");
+										System.out.println(custservice.viewStatement(userName));
 
 										break;
 									}
 									case 2:
 									{
-										System.out.println("\t\t\t\t\t\t\t\t"+custservice.viewSummary(userName));
+										System.out.println("\n");
+										System.out.println(custservice.viewSummary(userName));
 
 										break;
 									}
 									case 3:
 									{
-										System.out.println("\t\t\t\t\t\t\t\t"+custservice.viewPersonalDetails(userName));
+										System.out.println("\n");
+										System.out.println(custservice.viewPersonalDetails(userName));
 										break;
 									}
 									case 4:
@@ -496,9 +775,8 @@ public class ObsMain {
 								boolean custRequest3=true;
 								while(custRequest3)			// customer  transfer while loop opened
 								{
-									System.out.println("\n\n\t\t\t\t\t\t\t\tPress 1 : Transfer in Same bank");
-									System.out.println("\t\t\t\t\t\t\t\tPress 2 : Transfer in different bank");
-									System.out.println("\t\t\t\t\t\t\t\tPress 3 : for going to previous menu");
+									System.out.println("\n\n\t\t\t\t\t\t\t\tPress 1 : Transfer");
+									System.out.println("\t\t\t\t\t\t\t\tPress 2 : for going to previous menu");
 
 									System.out.print("\n\n\t\t\t\t\t\t\t\tEnter your choice : ");
 									int custTransfer=sc.nextInt();
@@ -513,18 +791,13 @@ public class ObsMain {
 										String senderUserName=userName;
 										System.out.println("Enter amount to transfer:");
 										float amount=sc.nextFloat();
-
+										System.out.println("\n");
 										System.out.println(custservice.transferAmt(senderUserName,receiverAccNo,amount));
 
 
 										break;
 									}
 									case 2:
-									{
-										System.out.println("\t\t\t\t\t\t\t\tTransfer in different bank is under progress");
-										break;
-									}
-									case 3:
 									{
 										custRequest3=false;
 										break;
@@ -559,8 +832,8 @@ public class ObsMain {
 										/*System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your User name  : ");
 											String updateuserName=sc.next();*/
 										System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your New password : ");
-										String updatepassword=sc.next();
-
+										String updatepassword=sc.nextLine();
+										System.out.println("\n");
 										String passwordMessage=custservice.updatepassword(userName,updatepassword);
 										System.out.println("\n\t\t\t\t\t\t\t\t\t\t"+passwordMessage);
 
@@ -572,7 +845,7 @@ public class ObsMain {
 											String updateuserName=sc.next();*/
 										System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your New Contact No. : ");
 										long updateContactNo=sc.nextLong();
-
+										System.out.println("\n");
 										String contactMessage=custservice.updateContactDetails(userName,updateContactNo);
 										System.out.println("\n\t\t\t\t\t\t\t\t\t\t"+contactMessage);
 										break;
@@ -582,8 +855,8 @@ public class ObsMain {
 										/*System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your User name  : ");
 											String updateuserName=sc.next();*/
 										System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your New Email : ");
-										String updateEmail=sc.next();
-
+										String updateEmail=sc.nextLine();
+										System.out.println("\n");
 										String EmailMessage=custservice.updateEmail(userName,updateEmail);
 										System.out.println("\n\t\t\t\t\t\t\t\t\t\t"+EmailMessage);
 										break;
@@ -593,8 +866,8 @@ public class ObsMain {
 										/*System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your User name  : ");
 											String updateuserName=sc.next();*/
 										System.out.print("\n\t\t\t\t\t\t\t\t\t\t Please Enter your New Address : ");
-										String updateAddress=sc.next();
-
+										String updateAddress=sc.nextLine();
+										System.out.println("\n");
 										String addressMessage=custservice.updateAddress(userName,updateAddress);
 										System.out.println("\n\t\t\t\t\t\t\t\t\t\t"+addressMessage);
 										break;
@@ -618,7 +891,7 @@ public class ObsMain {
 								boolean custRequest5=true;
 								while(custRequest5)				// customer  request while loop opened
 								{
-									System.out.println("\n\n\t\t\t\t\t\t\t\tPress 1 : Request for credit card");
+									System.out.println("\n\n\t\t\t\t\t\tPress 1 : Request for credit card");
 									System.out.println("\t\t\t\t\t\t\t\tPress 2 : Request for cheque book");
 									System.out.println("\t\t\t\t\t\t\t\tPress 3 : for going to previous menu");
 

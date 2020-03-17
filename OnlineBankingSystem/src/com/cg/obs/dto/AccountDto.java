@@ -107,12 +107,30 @@ public class AccountDto {
 	}
 
 
-	@Override
-	public boolean equals(Object obj) {
-		// TODO Auto-generated method stub
-		return this.getAccNo()==((AccountDto)obj).getAccNo();
-	}
+//	@Override
+//	public boolean equals(Object obj) {
+//		// TODO Auto-generated method stub
+//		return this.getAccNo()!=((AccountDto)obj).getAccNo();
+//	}
 
+	
+//	@Override
+//	public boolean equals(Object obj)
+//	{
+//		AccountDto accDto=(AccountDto)obj;
+//		if(this.accNo==accDto.accNo)
+//		{
+//			return true;
+//		}
+//		else
+//		{
+//			return false;
+//		}
+//	}
+//	public int hashCode()
+//	{
+//		return (int) this.accNo;
+//	}
 
 
 

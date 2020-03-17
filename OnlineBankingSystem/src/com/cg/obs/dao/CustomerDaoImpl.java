@@ -5,6 +5,7 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -17,7 +18,10 @@ public class CustomerDaoImpl implements CustomerDao{
 
 	StaticTransferDb tDb = new StaticTransferDb();
 	StaticCustomerDb cDb=new StaticCustomerDb();
+	StaticTransferDbNew tNewDb=new StaticTransferDbNew();
 	Set<AccountDto> accountSet=new HashSet<AccountDto>();
+	
+	List<TransactionDto> tranList=null;
 	
 	
 	
@@ -42,9 +46,10 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 	@Override
 	public String addCustomer(AccountDto accDto,UserDto userDto) {
 		cDb.customerDb.put(accDto, userDto);
-		TransactionDto tranDto=new TransactionDto();
-		tDb.transactionDb.put(accDto,tranDto );
-		return null;
+		//TransactionDto tranDto=new TransactionDto();
+		//tDb.transactionDb.put(accDto,tranDto );
+		return "Detail of username "+userDto.getUserName()+" Added Sucessfully";
+		
 	}
 
 	@Override
@@ -55,11 +60,11 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 		boolean validUser=false;
 		for(AccountDto accDto:accountSet)
 		{
-			System.out.println(accDto);
+			//System.out.println(accDto);
 			UserDto userDto=cDb.customerDb.get(accDto);
 			if(userDto.getUserName().equals(userName))
 			{
-				System.out.println(userDto);
+				//System.out.println(userDto);
 				if((userDto.getUserName().equals(userName)) && (userDto.getPassword().equals(passWord)))
 				{
 					validUser= true;
@@ -81,11 +86,24 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 		accountSet.addAll(tDb.transactionDb.keySet());
 		//System.out.println(arrayList);
 		String statement="";
-		for(AccountDto accDto:accountSet){
-			if(accDto.getUserName().equals(userName)){
+		boolean flag=true;
+		for(AccountDto accDto:accountSet)
+			
+		{
+			if(accDto.getUserName().equals(userName))
+			{
 				TransactionDto tranDto=tDb.transactionDb.get(accDto);
-				statement+="Date: "+ tranDto.getDate()+"Transfer Amount: " +tranDto.getAmtTransfer()+"Received Amount: " +tranDto.getAmtReceived()+"Remaining Balnace: "+tranDto.getBalance()+"\n";
+					statement+=
+							" Sender Account Number : "+ tranDto.getSenderAccountNumber()+
+							" Receiver Account Number : "+ tranDto.getReceiverAccountNumber()+
+							" Date: "+ tranDto.getDate()+" 	Transfer Amount: " +tranDto.getAmtTransfer()+
+							" 	Received Amount: " +tranDto.getAmtReceived()+" 	Remaining Balnace: "+tranDto.getBalance()+"\n";
+			   flag=false;
 			}
+		}
+		if(flag==true)
+		{
+			statement+="Do the transaction first!!!";
 		}
 		accountSet.clear();
 		return statement;
@@ -99,7 +117,7 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 		for(AccountDto accDto:accountSet){
 			if(accDto.getUserName().equals(userName))
 			{
-				summary+="Account Number: "+accDto.getAccNo()+"Account Balance:  "+accDto.getBalance()+"  \n";
+				summary+="Account Number: "+accDto.getAccNo()+"		Account Balance:  "+accDto.getBalance()+"  \n";
 			}
 		}
 		accountSet.clear();
@@ -117,9 +135,10 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 			if(accDto.getUserName().equals(userName))
 			{
 				UserDto userDto=cDb.customerDb.get(accDto);
-				personalDetail+=" Name :"+userDto.getCustName()+" Age:"+userDto.getAge()
-				+" Aadhar Number :"+userDto.getAadharNo()+" Address :"+userDto.getAddress()
-				+" Gender :"+userDto.getGender()+" Phone Number :"+userDto.getPhoneNo();
+				personalDetail+="\nName :"+userDto.getCustName()+"\nAge:"+userDto.getAge()
+				+"\nAadhar Number :"+userDto.getAadharNo()+"\nAddress :"+userDto.getAddress()
+				+"\nGender :"+userDto.getGender()+"\nPhone Number :"+userDto.getPhoneNo()
+				+"\nEmail Id :"+userDto.getEmailId();
 			}
 		}
 		accountSet.clear();
@@ -129,6 +148,7 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 	@Override
 	public String transferAmt(String senderUserName,Long receiverAccNo,float amount) 
 	{
+		Set<AccountDto> accountSet=new HashSet<AccountDto>();
 		accountSet.addAll(cDb.customerDb.keySet());
 		//Set<AccountDto> accountSetTransferDb=new HashSet<AccountDto>();
 		//accountSetTransferDb.addAll(tDb.transactionDb.keySet());
@@ -153,19 +173,21 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 
 		if(sameAccount)
 		{
-			transferResult+=" can't Transfer as sender and receiver account is same ";
+			transferResult+="Oops can't Transfer as sender and receiver account is same ";
 		}
 		else
 		{
 
 			if(accountExist)
 			{
+				long senderAccNo=0l;
 				for(AccountDto accDto:accountSet)
 				{
 					if(accDto.getUserName().equals(senderUserName))
 					{
+						
 						if(accDto.getBalance()>=amount)
-						{
+						{ senderAccNo=accDto.getAccNo();
 							TransactionDto tranDto=new TransactionDto();
 							float amountLeft=(accDto.getBalance()-amount);
 							accDto.setBalance(amountLeft);
@@ -173,9 +195,19 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 							tranDto.setBalance(amountLeft);
 							tranDto.setUsername(accDto.getUserName());
 							tranDto.setDate(LocalDate.now());
-							//System.out.println(tranDto);
-							tDb.transactionDb.put(accDto, tranDto);
-							transferResult+=" Amount "+amount+" Transfered to "+receiverAccNo;
+							tranDto.setReceiverAccountNumber(receiverAccNo);
+							tranDto.setSenderAccountNumber(senderAccNo);
+							//tranList=new ArrayList<TransactionDto>();
+							//tranList.add(tranDto);
+				
+							/*tDb.transactionDb.put(accDto, tranDto);*/
+							AccountDto accDt=new AccountDto();
+							accDt.setAccNo(accDto.getAccNo());
+							accDt.setBalance(accDto.getBalance());
+							accDt.setDate(accDto.getDate());
+							accDt.setUserName(accDto.getUserName());
+							tDb.transactionDb.put(accDt, tranDto);
+							transferResult+=" Amount "+amount+" 	Transfered to "+receiverAccNo;
 							
 							for(AccountDto accDto1:accountSet)
 							{
@@ -188,16 +220,27 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 									tranDto1.setAmtReceived(amount);
 									tranDto1.setBalance(Totalamount);
 									tranDto1.setUsername(accDto1.getUserName());
+									tranDto1.setReceiverAccountNumber(receiverAccNo);
+									tranDto1.setSenderAccountNumber(senderAccNo);
 									//System.out.println(accDto1.getUserName());
 									tranDto1.setDate(LocalDate.now());
+									
+									AccountDto accDtoN=new AccountDto();
+									accDtoN.setAccNo(accDto1.getAccNo());
+									accDtoN.setBalance(accDto1.getBalance());
+									accDtoN.setDate(accDto1.getDate());
+									accDtoN.setUserName(accDto1.getUserName());
 									//System.out.println(tranDto1);
-									tDb.transactionDb.put(accDto1, tranDto1);
+									tDb.transactionDb.put(accDtoN, tranDto1);
+//									tranList=new ArrayList<TransactionDto>();
+//									tranList.add(tranDto1);
+//									tNewDb.transactionDbNew.put(accDto, tranList);
 								}
 							}
 						}
 						else
 						{
-							transferResult+=" can't Transfer as amount is not sufficient ";
+							transferResult+="Oops can't Transfer as amount is not sufficient ";
 						}
 					}
 				}
@@ -205,7 +248,7 @@ public static HashMap<Integer,AccountDto> requestList=new HashMap<Integer,Accoun
 			}
 			else
 			{
-				transferResult+="Accont "+receiverAccNo+" Not Exist";
+				transferResult+="Accont "+receiverAccNo+" 	Not Exist";
 			}
 		}
 		return transferResult;
